@@ -5,7 +5,7 @@
  * @author Timur Kasumov aka XAKEPEHOK
  */
 
-namespace Leadvertex\Plugin\Components\Access\Token;
+namespace SalesRender\Plugin\Components\Access\Token;
 
 
 use Lcobucci\JWT\Builder;
@@ -13,11 +13,11 @@ use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Hmac\Sha512;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Token;
-use Leadvertex\Plugin\Components\Access\PublicKey\Exceptions\TokenVerificationException;
-use Leadvertex\Plugin\Components\Access\PublicKey\PublicKey;
-use Leadvertex\Plugin\Components\Access\Registration\Registration;
-use Leadvertex\Plugin\Components\Db\Components\PluginReference;
-use Leadvertex\Plugin\Components\Info\Info;
+use SalesRender\Plugin\Components\Access\PublicKey\Exceptions\TokenVerificationException;
+use SalesRender\Plugin\Components\Access\PublicKey\PublicKey;
+use SalesRender\Plugin\Components\Access\Registration\Registration;
+use SalesRender\Plugin\Components\Db\Components\PluginReference;
+use SalesRender\Plugin\Components\Info\Info;
 use RuntimeException;
 
 class GraphqlInputToken implements InputTokenInterface

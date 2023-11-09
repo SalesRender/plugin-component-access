@@ -1,13 +1,13 @@
 {
-  "name": "leadvertex/plugin-component-access",
-  "description": "LeadVertex plugin for access tools",
+  "name": "salesrender/plugin-component-access",
+  "description": "SalesRender plugin for access tools",
   "type": "library",
   "minimum-stability": "stable",
   "license": "proprietary",
   "authors": [
     {
       "name": "Timur Kasumov aka XAKEPEHOK",
-      "email": "support@leadvertex.com"
+      "email": "support@salesrender.com"
     }
   ],
   "require": {
@@ -15,16 +15,16 @@
     "ext-json": "*",
     "lcobucci/jwt": "3.3.3",
     "league/uri": "6.7.2",
-    "leadvertex/plugin-component-db": "^0.3.5",
-    "leadvertex/plugin-component-guzzle": "^0.3",
-    "leadvertex/plugin-component-info": "^0.1.2"
+    "salesrender/plugin-component-db": "^0.3.5",
+    "salesrender/plugin-component-guzzle": "^0.3",
+    "salesrender/plugin-component-info": "^0.1.2"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.0.0"
   },
   "autoload": {
     "psr-4": {
-      "Leadvertex\\Plugin\\Components\\Access\\": "src/"
+      "SalesRender\\Plugin\\Components\\Access\\": "src/"
     }
   }
 }

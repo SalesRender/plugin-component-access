@@ -5,15 +5,15 @@
  * @author Timur Kasumov (XAKEPEHOK)
  */
 
-namespace Leadvertex\Plugin\Components\Access\PublicKey;
+namespace SalesRender\Plugin\Components\Access\PublicKey;
 
 
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Rsa\Sha512;
 use Lcobucci\JWT\Token;
-use Leadvertex\Plugin\Components\Access\PublicKey\Exceptions\TokenVerificationException;
-use Leadvertex\Plugin\Components\Db\Model;
-use Leadvertex\Plugin\Components\Guzzle\Guzzle;
+use SalesRender\Plugin\Components\Access\PublicKey\Exceptions\TokenVerificationException;
+use SalesRender\Plugin\Components\Db\Model;
+use SalesRender\Plugin\Components\Guzzle\Guzzle;
 use League\Uri\UriString;
 
 class PublicKey extends Model

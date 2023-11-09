@@ -5,7 +5,7 @@
  * @author Timur Kasumov (XAKEPEHOK)
  */
 
-namespace Leadvertex\Plugin\Components\Access\Registration;
+namespace SalesRender\Plugin\Components\Access\Registration;
 
 
 use GuzzleHttp\Exception\GuzzleException;
@@ -14,12 +14,12 @@ use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Hmac\Sha512;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Token;
-use Leadvertex\Plugin\Components\Access\PublicKey\Exceptions\TokenVerificationException;
-use Leadvertex\Plugin\Components\Access\PublicKey\PublicKey;
-use Leadvertex\Plugin\Components\Db\Components\Connector;
-use Leadvertex\Plugin\Components\Db\Model;
-use Leadvertex\Plugin\Components\Db\SinglePluginModelInterface;
-use Leadvertex\Plugin\Components\Guzzle\Guzzle;
+use SalesRender\Plugin\Components\Access\PublicKey\Exceptions\TokenVerificationException;
+use SalesRender\Plugin\Components\Access\PublicKey\PublicKey;
+use SalesRender\Plugin\Components\Db\Components\Connector;
+use SalesRender\Plugin\Components\Db\Model;
+use SalesRender\Plugin\Components\Db\SinglePluginModelInterface;
+use SalesRender\Plugin\Components\Guzzle\Guzzle;
 use Psr\Http\Message\ResponseInterface;
 
 class Registration extends Model implements SinglePluginModelInterface
