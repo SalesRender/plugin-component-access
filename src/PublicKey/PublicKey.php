@@ -57,9 +57,20 @@ class PublicKey extends Model
             throw new TokenVerificationException("Issuer scheme is not '{$scheme}'", 200);
         }
 
-        $hostname = $_ENV['LV_PLUGIN_COMPONENT_REGISTRATION_HOSTNAME'] ?? 'backend.leadvertex.com';
-        if (!preg_match('~(^|\.)' . preg_quote($hostname) . '$~ui', $endpoint['host'])) {
-            throw new TokenVerificationException("Issuer hostname is not '{$hostname}'", 300);
+        $hostnames = explode(',', $_ENV['LV_PLUGIN_COMPONENT_REGISTRATION_HOSTNAME']) ??
+            ['backend.leadvertex.com', 'backend.salesrender.com'];
+        $hostnames = array_map('trim', $hostnames);
+
+        $invalidHostname = true;
+        foreach ($hostnames as $hostname) {
+            if (preg_match('~(^|\.)' . preg_quote($hostname) . '$~ui', $endpoint['host'])) {
+                $invalidHostname = false;
+                break;
+            }
+        }
+        if ($invalidHostname) {
+            throw new TokenVerificationException(sprintf("Issuer hostname is not in '{%s}'",
+                implode(',', $hostnames)), 300);
         }
 
         $hash = $token->getHeader('pkey');
