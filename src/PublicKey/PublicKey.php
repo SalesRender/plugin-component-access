@@ -57,8 +57,10 @@ class PublicKey extends Model
             throw new TokenVerificationException("Issuer scheme is not '{$scheme}'", 200);
         }
 
-        $hostnames = explode(',', $_ENV['LV_PLUGIN_COMPONENT_REGISTRATION_HOSTNAME']) ??
-            ['backend.leadvertex.com', 'backend.salesrender.com'];
+        $hostnames = explode(
+            ',',
+            $_ENV['LV_PLUGIN_COMPONENT_REGISTRATION_HOSTNAME'] ?? ['backend.leadvertex.com', 'backend.salesrender.com']
+        );
         $hostnames = array_map('trim', $hostnames);
 
         $invalidHostname = true;
