@@ -29,6 +29,9 @@ class Registration extends Model implements SinglePluginModelInterface
     protected string $LVPT;
     protected string $clusterUri;
 
+    protected string $country;
+    protected string $currency;
+
     /**
      * Registration constructor.
      * @param Token $token
@@ -40,6 +43,8 @@ class Registration extends Model implements SinglePluginModelInterface
         PublicKey::verify($token);
         $this->LVPT = $token->getClaim('LVPT');
         $this->clusterUri = $token->getClaim('iss');
+        $this->country = $token->getClaim('country');
+        $this->currency = $token->getClaim('currency');
     }
 
     /**
@@ -58,6 +63,16 @@ class Registration extends Model implements SinglePluginModelInterface
     public function getLVPT(): string
     {
         return $this->LVPT;
+    }
+
+    public function getCountry(): ?string
+    {
+        return $this->country;
+    }
+
+    public function getCurrency(): ?string
+    {
+        return $this->currency;
     }
 
     public function getClusterUri(): string
@@ -105,6 +120,8 @@ class Registration extends Model implements SinglePluginModelInterface
         return [
             'registeredAt' => ['INT', 'NOT NULL'],
             'LVPT' => ['VARCHAR(512)', 'NOT NULL'],
+            'country' => ['CHAR(2)', 'NOT NULL'],
+            'currency' => ['CHAR(3)', 'NOT NULL'],
             'clusterUri' => ['VARCHAR(512)', 'NOT NULL'],
         ];
     }
