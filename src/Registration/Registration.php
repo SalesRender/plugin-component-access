@@ -26,8 +26,11 @@ class Registration extends Model implements SinglePluginModelInterface
 {
 
     protected int $registeredAt;
-    protected string $LVPT;
+    protected string $HPT;
     protected string $clusterUri;
+
+    protected string $country;
+    protected string $currency;
 
     /**
      * Registration constructor.
@@ -38,8 +41,10 @@ class Registration extends Model implements SinglePluginModelInterface
     {
         $this->registeredAt = time();
         PublicKey::verify($token);
-        $this->LVPT = $token->getClaim('LVPT');
+        $this->HPT = $token->getClaim('HPT');
         $this->clusterUri = $token->getClaim('iss');
+        $this->country = $token->getClaim('country');
+        $this->currency = $token->getClaim('currency');
     }
 
     /**
@@ -55,9 +60,19 @@ class Registration extends Model implements SinglePluginModelInterface
         return $this->registeredAt;
     }
 
-    public function getLVPT(): string
+    public function getHPT(): string
     {
-        return $this->LVPT;
+        return $this->HPT;
+    }
+
+    public function getCountry(): ?string
+    {
+        return $this->country;
+    }
+
+    public function getCurrency(): ?string
+    {
+        return $this->currency;
     }
 
     public function getClusterUri(): string
@@ -80,7 +95,7 @@ class Registration extends Model implements SinglePluginModelInterface
         $builder->withClaim('body', $body);
         $builder->expiresAt(time() + $ttl);
 
-        return $builder->getToken(new Sha512(), new Key($this->getLVPT()));
+        return $builder->getToken(new Sha512(), new Key($this->getHPT()));
     }
 
     /**
@@ -104,7 +119,9 @@ class Registration extends Model implements SinglePluginModelInterface
     {
         return [
             'registeredAt' => ['INT', 'NOT NULL'],
-            'LVPT' => ['VARCHAR(512)', 'NOT NULL'],
+            'HPT' => ['VARCHAR(512)', 'NOT NULL'],
+            'country' => ['CHAR(2)', 'NOT NULL'],
+            'currency' => ['CHAR(3)', 'NOT NULL'],
             'clusterUri' => ['VARCHAR(512)', 'NOT NULL'],
         ];
     }
