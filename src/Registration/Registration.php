@@ -65,12 +65,12 @@ class Registration extends Model implements SinglePluginModelInterface
         return $this->HPT;
     }
 
-    public function getCountry(): ?string
+    public function getCountry(): string
     {
         return $this->country;
     }
 
-    public function getCurrency(): ?string
+    public function getCurrency(): string
     {
         return $this->currency;
     }
