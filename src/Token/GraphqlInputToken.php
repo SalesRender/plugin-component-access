@@ -76,7 +76,7 @@ class GraphqlInputToken implements InputTokenInterface
         return (new Builder())
             ->withClaim('jwt', (string) $this->getInputToken())
             ->withClaim('plugin', (string) Info::getInstance()->getType())
-            ->getToken(new Sha512(), new Key(Registration::find()->getLVPT()));
+            ->getToken(new Sha512(), new Key(Registration::find()->getHPT()));
     }
 
     public static function getInstance(): ?InputTokenInterface
