@@ -8,7 +8,7 @@
 namespace SalesRender\Plugin\Components\Access\Token;
 
 
-use Lcobucci\JWT\Token;
+use Lcobucci\JWT\UnencryptedToken;
 use SalesRender\Plugin\Components\Db\Components\PluginReference;
 
 interface InputTokenInterface
@@ -22,11 +22,11 @@ interface InputTokenInterface
 
     public function getBackendUri(): string;
 
-    public function getInputToken(): Token;
+    public function getInputToken(): UnencryptedToken;
 
     public function getPluginReference(): PluginReference;
 
-    public function getOutputToken(): Token;
+    public function getOutputToken(): UnencryptedToken;
 
     public static function getInstance(): ?InputTokenInterface;
 

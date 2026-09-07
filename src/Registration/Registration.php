@@ -8,12 +8,13 @@
 namespace SalesRender\Plugin\Components\Access\Registration;
 
 
+use DateTimeImmutable;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
-use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Signer\Hmac\Sha512;
-use Lcobucci\JWT\Signer\Key;
-use Lcobucci\JWT\Token;
+use Lcobucci\JWT\Signer\Key\InMemory;
+use Lcobucci\JWT\UnencryptedToken;
 use SalesRender\Plugin\Components\Access\PublicKey\Exceptions\TokenVerificationException;
 use SalesRender\Plugin\Components\Access\PublicKey\PublicKey;
 use SalesRender\Plugin\Components\Db\Components\Connector;
@@ -34,17 +35,17 @@ class Registration extends Model implements SinglePluginModelInterface
 
     /**
      * Registration constructor.
-     * @param Token $token
+     * @param UnencryptedToken $token
      * @throws TokenVerificationException
      */
-    public function __construct(Token $token)
+    public function __construct(UnencryptedToken $token)
     {
         $this->registeredAt = time();
         PublicKey::verify($token);
-        $this->HPT = $token->getClaim('HPT');
-        $this->clusterUri = $token->getClaim('iss');
-        $this->country = $token->getClaim('country');
-        $this->currency = $token->getClaim('currency');
+        $this->HPT = $token->claims()->get('HPT');
+        $this->clusterUri = $token->claims()->get('iss');
+        $this->country = $token->claims()->get('country');
+        $this->currency = $token->claims()->get('currency');
     }
 
     /**
@@ -80,22 +81,28 @@ class Registration extends Model implements SinglePluginModelInterface
         return $this->clusterUri;
     }
 
-    public function getSpecialRequestToken(array $body, int $ttl): Token
+    public function getSpecialRequestToken(array $body, int $ttl): UnencryptedToken
     {
         $reference = Connector::getReference();
 
-        $builder = new Builder();
-        $builder->issuedBy($_ENV['LV_PLUGIN_SELF_URI']);
-        $builder->permittedFor($this->getClusterUri());
-        $builder->withClaim('cid', $reference->getCompanyId());
-        $builder->withClaim('plugin', [
-            'alias' => $reference->getAlias(),
-            'id' => $reference->getId(),
-        ]);
-        $builder->withClaim('body', $body);
-        $builder->expiresAt(time() + $ttl);
+        $config = Configuration::forSymmetricSigner(
+            new Sha512(),
+            InMemory::plainText($this->getHPT())
+        );
 
-        return $builder->getToken(new Sha512(), new Key($this->getHPT()));
+        $now = new DateTimeImmutable();
+
+        return $config->builder()
+            ->issuedBy($_ENV['LV_PLUGIN_SELF_URI'])
+            ->permittedFor($this->getClusterUri())
+            ->withClaim('cid', $reference->getCompanyId())
+            ->withClaim('plugin', [
+                'alias' => $reference->getAlias(),
+                'id' => $reference->getId(),
+            ])
+            ->withClaim('body', $body)
+            ->expiresAt($now->modify("+{$ttl} seconds"))
+            ->getToken($config->signer(), $config->signingKey());
     }
 
     /**
@@ -111,7 +118,7 @@ class Registration extends Model implements SinglePluginModelInterface
         return Guzzle::getInstance()->request(
             $method,
             $uri,
-            ['json' => ['request' => (string) $this->getSpecialRequestToken($body, $ttl)]]
+            ['json' => ['request' => $this->getSpecialRequestToken($body, $ttl)->toString()]]
         );
     }
 

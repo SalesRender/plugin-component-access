@@ -8,11 +8,12 @@
 namespace SalesRender\Plugin\Components\Access\Token;
 
 
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Parser;
+use Lcobucci\JWT\Configuration;
+use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Signer\Hmac\Sha512;
-use Lcobucci\JWT\Signer\Key;
-use Lcobucci\JWT\Token;
+use Lcobucci\JWT\Signer\Key\InMemory;
+use Lcobucci\JWT\Token\Parser;
+use Lcobucci\JWT\UnencryptedToken;
 use SalesRender\Plugin\Components\Access\PublicKey\Exceptions\TokenVerificationException;
 use SalesRender\Plugin\Components\Access\PublicKey\PublicKey;
 use SalesRender\Plugin\Components\Access\Registration\Registration;
@@ -23,7 +24,7 @@ use RuntimeException;
 class GraphqlInputToken implements InputTokenInterface
 {
 
-    private Token $inputToken;
+    private UnencryptedToken $inputToken;
 
     private static ?GraphqlInputToken $instance = null;
 
@@ -38,45 +39,52 @@ class GraphqlInputToken implements InputTokenInterface
             throw new RuntimeException('Some token already loaded');
         }
 
-        $this->inputToken = (new Parser())->parse($token);
+        $parser = new Parser(new JoseEncoder());
+        $this->inputToken = $parser->parse($token);
         PublicKey::verify($this->inputToken);
     }
 
-    public function getInputToken(): Token
+    public function getInputToken(): UnencryptedToken
     {
         return $this->inputToken;
     }
 
     public function getPluginReference(): PluginReference
     {
+        $plugin = $this->getInputToken()->claims()->get('plugin');
         return new PluginReference(
-            $this->getInputToken()->getClaim('cid'),
-            $this->getInputToken()->getClaim('plugin')->alias,
-            $this->getInputToken()->getClaim('plugin')->id,
+            $this->getInputToken()->claims()->get('cid'),
+            $plugin['alias'],
+            $plugin['id'],
         );
     }
 
     public function getId(): string
     {
-        return $this->getInputToken()->getClaim('jti');
+        return $this->getInputToken()->claims()->get('jti');
     }
 
     public function getCompanyId(): string
     {
-        return $this->getInputToken()->getClaim('cid');
+        return $this->getInputToken()->claims()->get('cid');
     }
 
     public function getBackendUri(): string
     {
-        return $this->getInputToken()->getClaim('iss');
+        return $this->getInputToken()->claims()->get('iss');
     }
 
-    public function getOutputToken(): Token
+    public function getOutputToken(): UnencryptedToken
     {
-        return (new Builder())
-            ->withClaim('jwt', (string) $this->getInputToken())
+        $config = Configuration::forSymmetricSigner(
+            new Sha512(),
+            InMemory::plainText(Registration::find()->getHPT())
+        );
+
+        return $config->builder()
+            ->withClaim('jwt', $this->getInputToken()->toString())
             ->withClaim('plugin', (string) Info::getInstance()->getType())
-            ->getToken(new Sha512(), new Key(Registration::find()->getHPT()));
+            ->getToken($config->signer(), $config->signingKey());
     }
 
     public static function getInstance(): ?InputTokenInterface
